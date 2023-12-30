@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+  backend:
+    env_file:
+      - .env
+    volumes:
+      - static:/build
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+
+
+volumes:
+  static:
