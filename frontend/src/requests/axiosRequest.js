@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 
-export const rootAddress = 'https://server-gnnsie.fibo.cloud:80/';
+export const rootAddress = 'https://server-gnnsie.fibo.cloud/';
 
 
 const request = axios.create({

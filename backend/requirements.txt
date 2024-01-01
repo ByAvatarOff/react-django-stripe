@@ -8,3 +8,4 @@ pip==23.3.2
 psycopg2-binary
 python-dotenv==1.0.0
 stripe==7.10.0
+gunicorn
