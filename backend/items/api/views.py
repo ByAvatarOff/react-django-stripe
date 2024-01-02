@@ -1,4 +1,4 @@
-from django_stripe_api.settings import STRIPE_API_KEY, SITE_URL
+from django_stripe_api.settings import STRIPE_API_KEY
 from rest_framework.response import Response
 from rest_framework import viewsets, status, permissions
 from items.models import Item, Basket, Order, Discount
@@ -71,7 +71,6 @@ class ItemViewSet(viewsets.ViewSet):
         except Item.DoesNotExist:
             return Response(data={"error": "Error. Item with get id not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            print(e)
             return Response({'error': 'Something was wrong'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get_permissions(self):
