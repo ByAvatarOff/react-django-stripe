@@ -26,7 +26,7 @@ export default function CollectPaymentInfoComponent() {
         .then((response) => {
           setClientSecret(response.data.client_secret)
           setItemData(response.data)
-        }).catch(error => alert(error))
+        }).catch(error => alert(error.response.data.error))
     }
     else {
       request.get(`api/items/buy/${item_id}/`)

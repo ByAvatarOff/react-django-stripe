@@ -97,24 +97,16 @@ class OrderViewSet(viewsets.ViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update_type_order(self, request):
-        event = None
         payload = request.data
-        sig_header = request.headers['STRIPE_SIGNATURE']
-
         try:
-            event = stripe.Webhook.construct_event(
-                payload, sig_header, stripe.api_key
-            )
-        except ValueError as e:
-            raise e
-        except stripe.error.SignatureVerificationError as e:
-            raise e
-
-        if event['type'] == 'payment_intent.succeeded':
-            payment_intent = event['data']['object']
-        else:
-            print('Unhandled event type {}'.format(event['type']))
-
+            if payload.get('type') == 'payment_intent.succeeded':
+                order = Order.objects.get(stripe_order_id=payload.get('data').get('object').get('id'))
+                order.type_order = 'success'
+                order.save()
+            else:
+                return Response(status=status.HTTP_200_OK, data={"error": "Event type not success"})
+        except Order.DoesNotExist:
+            return Response(status=status.HTTP_200_OK, data={"error": "Order does not exist"})
         return Response(status=status.HTTP_200_OK)
 
     def get_permissions(self):
@@ -170,10 +162,13 @@ class BasketViewSet(viewsets.ViewSet):
     def confirm_order_in_basket(self, request, ids, currency):
         items = Item.objects.filter(id__in=ids.split(','))
         if not items:
-            return Response(data={'message': 'Your basket is empty'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'error': 'Your basket is empty'}, status=status.HTTP_400_BAD_REQUEST)
         info_items = " ".join([f'{item.name} - {item.price}{item.currency}' for item in items])
+        converted_sum = convert_currency(items, currency)
+        if isinstance(converted_sum, dict):
+            return Response(data={'error': f'Currency {currency} not supported for multiply order'}, status=status.HTTP_400_BAD_REQUEST)
         payment_intent = stripe.PaymentIntent.create(
-            amount=convert_decimal_to_int_value(apply_discounts(convert_currency(items, currency), request.user)),
+            amount=convert_decimal_to_int_value(apply_discounts(converted_sum, request.user)),
             currency=currency,
             payment_method_types=['card'],
             metadata={'items_data': info_items}

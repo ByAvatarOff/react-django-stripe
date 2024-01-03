@@ -13,22 +13,24 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'backend']
+ALLOWED_HOSTS = ['0.0.0.0', 'backend', '83.229.84.71', '127.0.0.1']
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
     'http://localhost:8000',
+    'http://83.229.84.71:80',
 ]
 CORS_ORIGIN_REGEX_WHITELIST = [
     'http://localhost:3000',
     'http://localhost:8000',
+    'http://83.229.84.71:80',
 ]
 
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://*'
+    'http://83.229.84.71'
 ]
 
 
@@ -87,13 +89,11 @@ DATABASES = {
     }
 }
 
-
 REST_FRAMEWORK = {
     "DEFAULT_PARSER_CLASSED": [
         'rest_framework.parsers.JSONParser',
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ]
 }
